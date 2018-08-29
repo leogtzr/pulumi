@@ -131,15 +131,10 @@ func newUpCmd() *cobra.Command {
 			contract.IgnoreError(os.RemoveAll(temp))
 		}()
 
-		// Cleanup the project name/description if needed.
-		projectName := template.ProjectName
-		if projectName == "${PROJECT}" {
-			projectName = workspace.ValueOrSanitizedDefaultProjectName(projectName, template.Name)
-		}
-		projectDescription := template.ProjectDescription
-		if projectDescription == "${DESCRIPTION}" {
-			projectDescription = ""
-		}
+		// Get the project name/description.
+		projectName := workspace.ValueOrSanitizedDefaultProjectName("", template.ProjectName, template.Name)
+		projectDescription := workspace.ValueOrDefaultProjectDescription(
+			"", template.ProjectDescription, template.Description)
 
 		// Copy the template files from the repo to the temporary "virtual workspace" directory.
 		if err = template.CopyTemplateFiles(temp, true, projectName, projectDescription); err != nil {
